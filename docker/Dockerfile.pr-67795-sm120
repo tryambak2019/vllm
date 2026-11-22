@@ -24,8 +24,10 @@ COPY . .
 COPY .github/pr-67795/q_gemm.baseline.cu /opt/q_gemm.baseline.cu
 
 RUN uv venv --python 3.12 && \
-    uv pip install -r requirements/build/cuda.txt --torch-backend=auto && \
-    uv pip install -r requirements/cuda.txt --torch-backend=auto
+    uv pip install -r requirements/build/cuda.txt --torch-backend=cu132 && \
+    uv pip install -r requirements/cuda.txt --torch-backend=cu132 && \
+    .venv/bin/python -c \
+      'import torch; assert torch.version.cuda == "13.2", torch.__version__'
 
 RUN uv pip install -e . --reinstall --no-build-isolation --no-deps && \
     extension=$(find vllm -maxdepth 1 -name '_C*.so' -print -quit) && \
