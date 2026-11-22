@@ -1,0 +1,67 @@
+name: Build PR 67795 sm120 benchmark image
+
+on:
+  push:
+    branches:
+      - pr-67795-sm120-validation
+    paths:
+      - .github/pr-67795/**
+      - .github/workflows/pr-67795-sm120-image.yml
+      - docker/Dockerfile.pr-67795-sm120
+      - csrc/quantization/gptq/q_gemm.cu
+      - requirements/**
+      - pyproject.toml
+      - setup.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/tryambak2019/vllm-pr-67795-sm120
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+
+      - name: Reclaim runner disk
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
+          sudo rm -rf /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          docker system prune --all --force
+          df -h
+
+      - name: Extract exact baseline kernel
+        run: |
+          mkdir -p .github/pr-67795
+          git show 5e51c0ca1041168de7aa9e096982aebaeebabd38:csrc/quantization/gptq/q_gemm.cu \
+            > .github/pr-67795/q_gemm.baseline.cu
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish immutable image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: docker/Dockerfile.pr-67795-sm120
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:pr-head
+          cache-from: type=gha,scope=pr-67795-sm120
+          cache-to: type=gha,mode=max,scope=pr-67795-sm120
+          provenance: mode=max
+          sbom: true

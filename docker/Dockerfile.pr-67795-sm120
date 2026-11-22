@@ -1,0 +1,53 @@
+FROM nvidia/cuda:13.2.0-devel-ubuntu24.04
+
+ARG BASELINE_SHA=5e51c0ca1041168de7aa9e096982aebaeebabd38
+ARG CANDIDATE_SHA=2c94a97dede4fef539e9bba8ddd9e5def7d845bf
+
+ENV CUDA_HOME=/usr/local/cuda \
+    PATH=/root/.cargo/bin:/root/.local/bin:/workspace/vllm/.venv/bin:$PATH \
+    TORCH_CUDA_ARCH_LIST=12.0 \
+    CMAKE_BUILD_PARALLEL_LEVEL=4 \
+    MAX_JOBS=4 \
+    CCACHE_DISABLE=1 \
+    SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 \
+    VLLM_USE_PRECOMPILED=0 \
+    UV_LINK_MODE=copy
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+      build-essential curl git libnuma-dev libssl-dev pkg-config && \
+    rm -rf /var/lib/apt/lists/* && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    curl -LsSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+
+WORKDIR /workspace/vllm
+COPY . .
+COPY .github/pr-67795/q_gemm.baseline.cu /opt/q_gemm.baseline.cu
+
+RUN uv venv --python 3.12 && \
+    uv pip install -r requirements/build/cuda.txt --torch-backend=auto && \
+    uv pip install -r requirements/cuda.txt --torch-backend=auto
+
+RUN uv pip install -e . --reinstall --no-build-isolation --no-deps && \
+    extension=$(find vllm -maxdepth 1 -name '_C*.so' -print -quit) && \
+    test -n "$extension" && \
+    mkdir -p /opt/vllm-variants/candidate /opt/vllm-variants/baseline && \
+    cp "$extension" /opt/vllm-variants/candidate/ && \
+    printf '%s\n' "$extension" > /opt/vllm-variants/extension-path && \
+    printf '%s\n' "$CANDIDATE_SHA" > /opt/vllm-variants/candidate/commit
+
+RUN cp /opt/q_gemm.baseline.cu csrc/quantization/gptq/q_gemm.cu && \
+    uv pip install -e . --reinstall --no-build-isolation --no-deps && \
+    extension=$(cat /opt/vllm-variants/extension-path) && \
+    cp "$extension" /opt/vllm-variants/baseline/ && \
+    printf '%s\n' "$BASELINE_SHA" > /opt/vllm-variants/baseline/commit && \
+    test "$(sha256sum /opt/vllm-variants/candidate/$(basename "$extension") | cut -d' ' -f1)" != \
+      "$(sha256sum /opt/vllm-variants/baseline/$(basename "$extension") | cut -d' ' -f1)"
+
+COPY .github/pr-67795/benchmark_gptq_m1.py /opt/bench/benchmark_gptq_m1.py
+COPY .github/pr-67795/run_prebuilt_m1.sh /opt/bench/run_prebuilt_m1.sh
+
+LABEL org.opencontainers.image.source="https://github.com/tryambak2019/vllm" \
+      org.opencontainers.image.revision="$CANDIDATE_SHA" \
+      org.opencontainers.image.description="PR 67795 sm_120 baseline/candidate benchmark image"
+
+CMD ["bash"]
