@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 2
+          fetch-depth: 3
 
       - name: Reclaim runner disk
         run: |
@@ -40,7 +40,8 @@ jobs:
       - name: Extract exact baseline kernel
         run: |
           mkdir -p .github/pr-67795
-          git show 5e51c0ca1041168de7aa9e096982aebaeebabd38:csrc/quantization/gptq/q_gemm.cu \
+          test "$(git rev-parse HEAD^^)" = 5e51c0ca1041168de7aa9e096982aebaeebabd38
+          git show HEAD^^:csrc/quantization/gptq/q_gemm.cu \
             > .github/pr-67795/q_gemm.baseline.cu
 
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
