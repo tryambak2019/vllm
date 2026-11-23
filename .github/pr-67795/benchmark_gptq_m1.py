@@ -4,6 +4,7 @@
 """Correctness-check and benchmark the fused 4-bit GPTQ kernel at M=1."""
 
 import argparse
+import importlib.metadata
 import json
 import statistics
 import subprocess
@@ -66,8 +67,21 @@ def main() -> None:
     ops.gptq_shuffle(qweight, 4)
     x = torch.randn(size_m, size_k, device="cuda", dtype=torch.float16)
 
-    def run() -> torch.Tensor:
-        return ops.gptq_gemm(x, qweight, qzeros, scales, True, False, 4)
+    def run(
+        input_x: torch.Tensor = x,
+        input_qweight: torch.Tensor = qweight,
+        input_qzeros: torch.Tensor = qzeros,
+        input_scales: torch.Tensor = scales,
+    ) -> torch.Tensor:
+        return ops.gptq_gemm(
+            input_x,
+            input_qweight,
+            input_qzeros,
+            input_scales,
+            True,
+            False,
+            4,
+        )
 
     output = run().float()
     weight = (q.float() - scalar_types.uint4b8.bias) * scales.float().repeat_interleave(
@@ -90,6 +104,11 @@ def main() -> None:
         ramp_calls += 100
 
     state_before_timing = gpu_state()
+    from cupti import cupti  # noqa: F401
+
+    cupti_version = importlib.metadata.version("cupti-python")
+    if int(cupti_version.split(".")[0]) < 13:
+        raise RuntimeError(f"cupti-python {cupti_version} is older than 13")
     trials_us = [
         statistics.median(
             bench_gpu_time_with_cupti(
@@ -97,6 +116,7 @@ def main() -> None:
                 use_cuda_graph=True,
                 cold_l2_cache=True,
                 dry_run_iters=10,
+                input_args=(x, qweight, qzeros, scales),
                 repeat_iters=args.repeat,
             )
         )
@@ -135,6 +155,7 @@ def main() -> None:
         "environment": {
             "torch": torch.__version__,
             "torch_cuda": torch.version.cuda,
+            "cupti_python": cupti_version,
             "device": str(torch.accelerator.current_accelerator()),
             "before_ramp": state_before_ramp,
             "before_timing": state_before_timing,
