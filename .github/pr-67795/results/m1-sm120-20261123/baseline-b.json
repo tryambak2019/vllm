@@ -1,0 +1,74 @@
+{
+  "label": "baseline-b",
+  "commit": "5e51c0ca1041168de7aa9e096982aebaeebabd38",
+  "shape": {
+    "m": 1,
+    "k": 4096,
+    "n": 4096,
+    "group_size": 128,
+    "bits": 4
+  },
+  "correctness": {
+    "relative_l2": 0.0009705125703476369,
+    "limit": 0.01
+  },
+  "timing": {
+    "method": "FlashInfer CUPTI, CUDA graph, cold L2",
+    "median_us": 16.608,
+    "trials_us": [
+      16.256,
+      16.604,
+      16.672,
+      16.591500000000003,
+      16.672,
+      16.608,
+      16.761499999999998
+    ],
+    "repeat_iters": 100,
+    "ramp_seconds": 60.0,
+    "ramp_calls": 5972500,
+    "minimum_effective_gbps": 525.8111753371869
+  },
+  "environment": {
+    "torch": "2.14.0+cu132",
+    "torch_cuda": "13.2",
+    "cupti_python": "13.5.0",
+    "device": "cuda",
+    "before_ramp": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "697",
+      "clocks.max.sm": "2430",
+      "power.draw": "60.06",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "36"
+    },
+    "before_timing": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "2415",
+      "clocks.max.sm": "2430",
+      "power.draw": "185.27",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "43"
+    },
+    "after_timing": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "2347",
+      "clocks.max.sm": "2430",
+      "power.draw": "171.38",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "43"
+    }
+  }
+}

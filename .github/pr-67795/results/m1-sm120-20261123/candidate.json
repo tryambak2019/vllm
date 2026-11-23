@@ -1,0 +1,74 @@
+{
+  "label": "candidate",
+  "commit": "2c94a97dede4fef539e9bba8ddd9e5def7d845bf",
+  "shape": {
+    "m": 1,
+    "k": 4096,
+    "n": 4096,
+    "group_size": 128,
+    "bits": 4
+  },
+  "correctness": {
+    "relative_l2": 0.0004965493571944535,
+    "limit": 0.01
+  },
+  "timing": {
+    "method": "FlashInfer CUPTI, CUDA graph, cold L2",
+    "median_us": 81.824,
+    "trials_us": [
+      81.5835,
+      81.47699999999999,
+      81.5715,
+      81.888,
+      81.984,
+      81.9215,
+      81.824
+    ],
+    "repeat_iters": 100,
+    "ramp_seconds": 60.0,
+    "ramp_calls": 1553600,
+    "minimum_effective_gbps": 106.72506843957763
+  },
+  "environment": {
+    "torch": "2.14.0+cu132",
+    "torch_cuda": "13.2",
+    "cupti_python": "13.5.0",
+    "device": "cuda",
+    "before_ramp": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "1320",
+      "clocks.max.sm": "2430",
+      "power.draw": "60.01",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "39"
+    },
+    "before_timing": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "2347",
+      "clocks.max.sm": "2430",
+      "power.draw": "126.14",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "38"
+    },
+    "after_timing": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "2332",
+      "clocks.max.sm": "2430",
+      "power.draw": "133.24",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "38"
+    }
+  }
+}

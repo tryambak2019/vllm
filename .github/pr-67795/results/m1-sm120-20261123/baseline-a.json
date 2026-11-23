@@ -1,0 +1,74 @@
+{
+  "label": "baseline-a",
+  "commit": "5e51c0ca1041168de7aa9e096982aebaeebabd38",
+  "shape": {
+    "m": 1,
+    "k": 4096,
+    "n": 4096,
+    "group_size": 128,
+    "bits": 4
+  },
+  "correctness": {
+    "relative_l2": 0.0009220951469615102,
+    "limit": 0.01
+  },
+  "timing": {
+    "method": "FlashInfer CUPTI, CUDA graph, cold L2",
+    "median_us": 16.639999999999997,
+    "trials_us": [
+      15.973999999999998,
+      16.608999999999998,
+      16.704,
+      16.639999999999997,
+      16.704,
+      16.598000000000003,
+      16.7045
+    ],
+    "repeat_iters": 100,
+    "ramp_seconds": 60.0,
+    "ramp_calls": 6378600,
+    "minimum_effective_gbps": 524.8000000000001
+  },
+  "environment": {
+    "torch": "2.14.0+cu132",
+    "torch_cuda": "13.2",
+    "cupti_python": "13.5.0",
+    "device": "cuda",
+    "before_ramp": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "1185",
+      "clocks.max.sm": "2430",
+      "power.draw": "60.46",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "32"
+    },
+    "before_timing": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "2415",
+      "clocks.max.sm": "2430",
+      "power.draw": "206.21",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "43"
+    },
+    "after_timing": {
+      "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "uuid": "GPU-53f4b3d3-36c5-77c7-5233-4e81ea81998f",
+      "driver_version": "610.57.04",
+      "pstate": "P0",
+      "clocks.current.sm": "2332",
+      "clocks.max.sm": "2430",
+      "power.draw": "169.76",
+      "power.limit": "600.00",
+      "power.default_limit": "600.00",
+      "temperature.gpu": "42"
+    }
+  }
+}
